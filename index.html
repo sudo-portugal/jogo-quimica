@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub de Jogos: Química Orgânica</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="menu-container" class="screen visible">
+        <h1>Centro de Jogos: Funções Orgânicas</h1>
+        <p>Escolha um jogo para testar seus conhecimentos!</p>
+        <button class="menu-button" data-game="game-quiz">1. Caça-Função (Quiz)</button>
+        <button class="menu-button" data-game="game-dragdrop">2. Laboratório de Classificação</button>
+        <button class="menu-button" data-game="game-memory">3. Memória Molecular</button>
+    </div>
+
+    <div id="game-quiz" class="screen">
+        <button class="back-to-menu">Voltar ao Menu</button>
+        <h2>Jogo 1: Caça-Função (Quiz)</h2>
+        <div id="quiz-question" class="molecule-display"></div>
+        <div id="quiz-options" class="quiz-options-grid">
+        </div>
+        <div id="quiz-feedback"></div>
+        <button id="quiz-next">Próxima Pergunta</button>
+        <div id="quiz-score">Pontuação: 0</div>
+    </div>
+
+    <div id="game-dragdrop" class="screen">
+        <button class="back-to-menu">Voltar ao Menu</button>
+        <h2>Jogo 2: Laboratório de Classificação</h2>
+        <p>Arraste a molécula para a prateleira correta!</p>
+
+        <div class="lab-container">
+            <div id="molecule-source">
+            </div>
+
+            <div class="drop-zones">
+                <div class="drop-zone" data-category="Hidrocarbonetos">
+                    <h3>Hidrocarbonetos</h3>
+                </div>
+                <div class="drop-zone" data-category="Oxigenadas">
+                    <h3>Oxigenadas</h3>
+                </div>
+                <div class="drop-zone" data-category="Nitrogenadas">
+                    <h3>Nitrogenadas</h3>
+                </div>
+                <div class="drop-zone" data-category="Sulfuradas">
+                    <h3>Sulfuradas</h3>
+                </div>
+                <div class="drop-zone" data-category="Mistas">
+                    <h3>Funções Mistas</h3>
+                </div>
+            </div>
+        </div>
+        <div id="drag-feedback"></div>
+    </div>
+
+    <div id="game-memory" class="screen">
+        <button class="back-to-menu">Voltar ao Menu</button>
+        <h2>Jogo 3: Memória Molecular</h2>
+        <p>Combine a molécula com sua função!</p>
+        <div class="memory-grid" id="memory-grid">
+        </div>
+        <div id="memory-stats">
+            Tentativas: <span id="memory-tries">0</span>
+        </div>
+        <button id="memory-reset">Reiniciar Jogo</button>
+    </div>
+    
+    <audio id="sound-correct" src="https://www.myinstants.com/media/sounds/correct.mp3" preload="auto"></audio>
+    <audio id="sound-wrong" src="https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3"
+        preload="auto"></audio>
+    <script src="database.js"></script>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

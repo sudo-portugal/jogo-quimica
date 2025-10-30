@@ -1,0 +1,358 @@
+/* --- ESTILOS GLOBAIS E RESPONSIVIDADE --- */
+:root {
+    --primary-color: #0056b3;
+    --secondary-color: #f4f4f4;
+    --correct-color: #28a745;
+    --wrong-color: #dc3545;
+    --bg-color: #e9ecef;
+}
+
+/* * Adiciona box-sizing para facilitar o controle de padding
+ * e define a fonte base.
+ */
+html {
+    box-sizing: border-box;
+    font-size: 16px; /* Define a base para 'rem' */
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: #333;
+    text-align: center;
+    margin: 0;
+    padding: 10px; /* Reduzido para melhor encaixe mobile */
+    line-height: 1.5;
+}
+
+/* --- ESTRUTURA DAS TELAS --- */
+.screen {
+    display: none;
+    width: 100%;
+    max-width: 900px; /* Largura máxima em desktops */
+    margin: 0 auto;
+    padding: 20px 10px; /* Mais padding vertical, menos horizontal */
+    animation: fadeIn 0.5s;
+}
+
+.screen.visible {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- TÍTULOS E BOTÕES --- */
+h1 {
+    color: var(--primary-color);
+    font-size: 2rem; /* Tamanho base */
+}
+
+h2 {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+}
+
+button {
+    font-size: 1rem;
+    padding: 12px 18px; /* Botões um pouco maiores para toque */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: var(--primary-color);
+    color: white;
+    transition: background-color 0.2s, transform 0.2s;
+    margin: 5px;
+    /* Impede que o texto do botão seja selecionado */
+    user-select: none; 
+}
+
+button:hover {
+    background-color: #004494;
+    transform: translateY(-2px);
+}
+
+.back-to-menu {
+    display: block; /* Faz o botão ocupar a linha */
+    width: 60%;
+    max-width: 200px; /* Limita o tamanho em telas grandes */
+    margin: 0 auto 20px auto; /* Centraliza e dá espaço abaixo */
+    float: none; /* Remove o float antigo */
+    background-color: #6c757d;
+}
+
+.back-to-menu:hover {
+    background-color: #5a6268;
+}
+
+/* --- Tela 1: Menu --- */
+#menu-container p {
+    font-size: 1.1rem;
+}
+
+.menu-button {
+    display: block;
+    width: 95%; /* Ocupa quase toda a largura mobile */
+    max-width: 450px;
+    margin: 15px auto;
+    padding: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* --- Tela 2: Jogo 1 - Quiz --- */
+.molecule-display {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.3rem; /* Ajustado para caber em telas menores */
+    font-weight: bold;
+    padding: 25px;
+    background-color: white;
+    border: 2px dashed var(--primary-color);
+    border-radius: 8px;
+    margin: 20px 0;
+    min-height: 50px;
+    word-wrap: break-word; /* Garante que estruturas longas quebrem a linha */
+}
+
+/* * Este grid já era responsivo! 
+ * 'auto-fit' e 'minmax' são excelentes para isso.
+ */
+.quiz-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.quiz-options-grid button {
+    width: 100%;
+}
+
+#quiz-feedback {
+    margin: 15px 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+#quiz-next {
+    display: none;
+    background-color: var(--correct-color);
+    padding: 15px;
+    font-size: 1.1rem;
+}
+
+/* --- Tela 3: Jogo 2 - Drag & Drop (MUDANÇA IMPORTANTE) --- */
+.lab-container {
+    display: flex;
+    /* * Em telas grandes, fica lado a lado.
+     * Em telas pequenas (ver media query), vira 'column'.
+     */
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 20px;
+}
+
+#molecule-source {
+    width: 30%; /* Largura base para desktop */
+    padding: 10px;
+    border: 2px solid #ccc;
+    background: white;
+    min-height: 400px;
+    border-radius: 8px;
+}
+
+.molecule-drag {
+    font-family: 'Courier New', Courier, monospace;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: var(--secondary-color);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: grab;
+    font-weight: bold;
+    word-wrap: break-word; /* Quebra de linha */
+}
+
+.molecule-drag.dragging {
+    opacity: 0.5;
+}
+
+.drop-zones {
+    width: 68%; /* Largura base para desktop */
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.drop-zone {
+    padding: 15px; /* Padding menor para mobile */
+    border: 2px dashed var(--primary-color);
+    border-radius: 8px;
+    background-color: white;
+    min-height: 60px;
+    transition: background-color 0.2s, border-color 0.2s;
+    display: flex; /* Para centralizar o título */
+    align-items: center;
+    justify-content: center;
+}
+
+.drop-zone h3 {
+    margin: 0;
+    pointer-events: none;
+    font-size: 1rem;
+}
+
+.drop-zone.over {
+    background-color: #cfe2ff;
+    border-color: #004494;
+}
+
+#drag-feedback {
+    margin-top: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+/* --- Tela 4: Jogo 3 - Memória (MUDANÇA IMPORTANTE) --- */
+.memory-grid {
+    display: grid;
+    /* * Em desktop: 4 colunas 
+     * Em mobile (ver media query): 3 colunas
+     */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.memory-card {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Truque para manter o card quadrado */
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    cursor: pointer;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    user-select: none;
+}
+
+.memory-card.flipped {
+    transform: rotateY(180deg);
+    background-color: white;
+    color: #333;
+    border: 2px solid var(--primary-color);
+}
+
+.memory-card .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* Esconde o verso */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    text-align: center;
+}
+
+.card-front {
+    transform: rotateY(0deg);
+    font-size: 2.5rem; /* Símbolo 'Q' maior */
+    color: white;
+}
+
+.card-back {
+    transform: rotateY(180deg);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem; /* Fonte menor para caber nomes longos */
+    font-weight: bold;
+}
+
+.memory-card.matched {
+    background-color: var(--correct-color);
+    color: white;
+    border-color: var(--correct-color);
+    transform: rotateY(180deg);
+}
+
+#memory-stats {
+    font-size: 1.1rem;
+    margin: 15px 0;
+}
+
+/* --- Feedback de Cores --- */
+.correct { color: var(--correct-color); }
+.wrong { color: var(--wrong-color); }
+
+
+/*
+==============================================
+=== ÁREA DE MEDIA QUERIES (RESPONSIVIDADE) ===
+==============================================
+*/
+
+/* Para telas pequenas (celulares, até 650px) */
+@media (max-width: 650px) {
+    
+    body {
+        padding: 5px; /* Menos padding no corpo */
+    }
+
+    h1 {
+        font-size: 1.8rem; /* Título principal menor */
+    }
+
+    h2 {
+        font-size: 1.4rem; /* Subtítulo menor */
+    }
+
+    /* * MUDANÇA JOGO 2 (Drag & Drop): 
+     * Empilha a fonte de moléculas e as caixas de largar.
+     */
+    .lab-container {
+        flex-direction: column; /* EMPILHAR! */
+        align-items: center;
+    }
+
+    #molecule-source {
+        width: 100%; /* Largura total */
+        min-height: 150px; /* Altura menor */
+        display: flex; /* Coloca as moléculas lado a lado se couber */
+        flex-wrap: wrap; /* Permite quebrar linha */
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .molecule-drag {
+        margin: 5px; /* Menos margem */
+    }
+
+    .drop-zones {
+        width: 100%; /* Largura total */
+    }
+
+    /* * MUDANÇA JOGO 3 (Memória): 
+     * Muda o grid de 4 colunas para 3 colunas.
+     * Como temos 12 cartas, fica um grid 3x4 perfeito.
+     */
+    .memory-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px; /* Espaço menor entre cartas */
+    }
+
+    .card-back {
+        font-size: 0.8rem; /* Fonte ainda menor se necessário */
+    }
+
+    .card-front {
+        font-size: 2rem;
+    }
+}
