@@ -292,6 +292,13 @@ button:hover {
 .correct { color: var(--correct-color); }
 .wrong { color: var(--wrong-color); }
 
+/* --- NOVO: Estilo para seleção por toque (Jogo 2) --- */
+.molecule-drag.selected {
+    background-color: #cfe2ff; /* Um azul claro para indicar seleção */
+    border: 2px solid var(--primary-color);
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
 
 /*
 ==============================================
@@ -355,4 +362,5 @@ button:hover {
     .card-front {
         font-size: 2rem;
     }
+    
 }

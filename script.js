@@ -140,21 +140,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // --- SEÇÃO 4: JOGO 2 - LÓGICA DO DRAG & DROP ---
+    // --- SEÇÃO 4: JOGO 2 - LÓGICA DO DRAG & DROP (ATUALIZADO) ---
 
     const moleculeSourceEl = document.getElementById('molecule-source');
     const dropZonesEl = document.querySelectorAll('.drop-zone');
+    const dropZonesContainer = document.querySelector('.drop-zones'); // Pega o contêiner das prateleiras
     const dragFeedbackEl = document.getElementById('drag-feedback');
+
     let dragMolecules = [];
     let correctDrops = 0;
+    let selectedMoleculeEl = null; // --- NOVO: Para lógica de clique/toque
 
     function initDragDrop() {
         // Pega 5 moléculas aleatórias para o jogo
         dragMolecules = shuffleArray(database).slice(0, 5);
         correctDrops = 0;
-        dragFeedbackEl.textContent = '';
+        dragFeedbackEl.textContent = 'Arraste ou clique na molécula para selecionar.'; // Texto de instrução atualizado
         moleculeSourceEl.innerHTML = '';
-        
+        selectedMoleculeEl = null; // Reseta a molécula selecionada
+
+        // --- NOVO: Randomiza a ordem das prateleiras (categorias) ---
+        const zones = Array.from(dropZonesEl);
+        const shuffledZones = shuffleArray(zones);
+        shuffledZones.forEach(zone => dropZonesContainer.appendChild(zone));
+        // --- FIM DA RANDOMIZAÇÃO ---
+
         // Limpa as drop zones de moléculas de jogos anteriores
         dropZonesEl.forEach(zone => {
             const children = Array.from(zone.children);
@@ -175,7 +185,13 @@ document.addEventListener('DOMContentLoaded', () => {
             el.dataset.category = molecule.categoria;
             moleculeSourceEl.appendChild(el);
 
+            // Evento 1: Drag & Drop (Desktop)
             el.addEventListener('dragstart', (e) => {
+                // Se estiver no modo de clique, cancela
+                if (selectedMoleculeEl) {
+                    selectedMoleculeEl.classList.remove('selected');
+                    selectedMoleculeEl = null;
+                }
                 e.dataTransfer.setData('text/plain', e.target.dataset.id);
                 e.target.classList.add('dragging');
             });
@@ -183,14 +199,86 @@ document.addEventListener('DOMContentLoaded', () => {
             el.addEventListener('dragend', (e) => {
                 e.target.classList.remove('dragging');
             });
+
+            // --- NOVO: Evento 2: Clique/Toque (Mobile) ---
+            el.addEventListener('click', () => handleMoleculeClick(el));
         });
     }
 
-    // --- CORREÇÃO AQUI ---
-    // Adiciona os event listeners para CADA drop zone usando o forEach
+    // --- NOVO: Função para lidar com o clique na molécula ---
+    function handleMoleculeClick(el) {
+        // Se já estava selecionado, des-seleciona
+        if (el.classList.contains('selected')) {
+            el.classList.remove('selected');
+            selectedMoleculeEl = null;
+            dragFeedbackEl.textContent = 'Seleção cancelada. Arraste ou clique na molécula.';
+            return;
+        }
+
+        // Remove a seleção de qualquer outro
+        if (selectedMoleculeEl) {
+            selectedMoleculeEl.classList.remove('selected');
+        }
+
+        // Seleciona o novo
+        selectedMoleculeEl = el;
+        el.classList.add('selected');
+        dragFeedbackEl.textContent = 'Molécula selecionada! Agora clique na prateleira correta.';
+    }
+
+    // --- NOVO: Função para lidar com o clique na prateleira ---
+    function handleZoneClick(zone) {
+        // Só funciona se uma molécula tiver sido clicada antes
+        if (!selectedMoleculeEl) return;
+
+        const correctCategory = selectedMoleculeEl.dataset.category;
+        const dropCategory = zone.dataset.category;
+
+        if (correctCategory === dropCategory) {
+            soundCorrect.play();
+            // Lógica de acerto (copiada do 'drop' original)
+            selectedMoleculeEl.remove(); // Remove da lista de arrastar
+            zone.appendChild(selectedMoleculeEl); // Adiciona na zona correta
+            selectedMoleculeEl.setAttribute('draggable', 'false');
+            selectedMoleculeEl.style.cursor = 'default';
+            selectedMoleculeEl.style.backgroundColor = 'var(--correct-color)';
+            selectedMoleculeEl.style.color = 'white';
+            dragFeedbackEl.textContent = 'Correto!';
+            dragFeedbackEl.className = 'correct';
+            correctDrops++;
+            if (correctDrops === dragMolecules.length) {
+                dragFeedbackEl.textContent = 'Parabéns! Você classificou todas!';
+            }
+        } else {
+            soundWrong.play();
+            // Lógica de erro (copiada do 'drop' original)
+            dragFeedbackEl.textContent = 'Categoria errada! Tente novamente.';
+            dragFeedbackEl.className = 'wrong';
+            // No clique, o item não "volta" sozinho, apenas damos o feedback.
+            // O usuário terá que clicar na prateleira certa.
+        }
+
+        // Des-seleciona a molécula após a tentativa
+        selectedMoleculeEl.classList.remove('selected');
+        selectedMoleculeEl = null;
+
+        // Limpa o feedback de erro após um tempo
+        if (dragFeedbackEl.className === 'wrong') {
+            setTimeout(() => {
+                if (dragFeedbackEl.className === 'wrong') { // Só limpa se ainda for 'wrong'
+                    dragFeedbackEl.textContent = 'Arraste ou clique na molécula para selecionar.';
+                    dragFeedbackEl.className = '';
+                }
+            }, 2000);
+        }
+    }
+
+
+    // Adiciona os event listeners para CADA drop zone
     dropZonesEl.forEach(zone => {
+        // --- Eventos de Drag & Drop (Desktop) ---
         zone.addEventListener('dragover', (e) => {
-            e.preventDefault(); // Necessário para permitir o drop
+            e.preventDefault();
             zone.classList.add('over');
         });
 
@@ -203,21 +291,18 @@ document.addEventListener('DOMContentLoaded', () => {
             zone.classList.remove('over');
 
             const id = e.dataTransfer.getData('text/plain');
-            // Previne erro se o drop for inválido
-            if (!id) return; 
-
+            if (!id) return;
             const draggedEl = document.querySelector(`.molecule-drag[data-id='${id}']`);
-            // Previne erro se o elemento já foi movido
-            if (!draggedEl) return; 
+            if (!draggedEl) return;
 
             const correctCategory = draggedEl.dataset.category;
             const dropCategory = zone.dataset.category;
 
             if (correctCategory === dropCategory) {
-                soundCorrect.play(); // <-- Som de acerto
-                // Acertou
-                draggedEl.remove(); // Remove da lista de arrastar
-                zone.appendChild(draggedEl); // Adiciona na zona correta
+                soundCorrect.play();
+                // (Lógica de acerto)
+                draggedEl.remove();
+                zone.appendChild(draggedEl);
                 draggedEl.setAttribute('draggable', 'false');
                 draggedEl.style.cursor = 'default';
                 draggedEl.style.backgroundColor = 'var(--correct-color)';
@@ -229,15 +314,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     dragFeedbackEl.textContent = 'Parabéns! Você classificou todas!';
                 }
             } else {
-                soundWrong.play(); // <-- Som de erro
-                // Errou
+                soundWrong.play();
+                // (Lógica de erro)
                 dragFeedbackEl.textContent = 'Categoria errada! Tente novamente.';
                 dragFeedbackEl.className = 'wrong';
             }
         });
-    });
-    // --- FIM DA CORREÇÃO ---
 
+        // --- NOVO: Evento de Clique/Toque (Mobile) ---
+        zone.addEventListener('click', () => handleZoneClick(zone));
+    });
+    // --- FIM DA SEÇÃO 4 ATUALIZADA ---
 
     // --- SEÇÃO 5: JOGO 3 - LÓGICA DO JOGO DA MEMÓRIA ---
     // (Esta seção estava fora do 'DOMContentLoaded', agora está dentro)
@@ -383,6 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return newArray;
     }
 
-// --- FIM DO SCRIPT ---
-// Esta é a chave '});' que fecha o 'DOMContentLoaded' lá do topo.
+    // --- FIM DO SCRIPT ---
+    // Esta é a chave '});' que fecha o 'DOMContentLoaded' lá do topo.
 });
